@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库 · pg模拟器 查询对照</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            background: linear-gradient(145deg, #fdefe1 0%, #f7d9c4 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.2rem;
+            line-height: 1.7;
+            color: #2e241e;
+        }
+
+        .page-wrap {
+            max-width: 1120px;
+            width: 100%;
+        }
+
+        /* 标题与导航感 */
+        .library-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .library-header h1 {
+            font-size: 2.4rem;
+            font-weight: 550;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #894e3a, #b2654a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+
+        .library-header .sub-label {
+            display: block;
+            margin-top: 0.3rem;
+            font-size: 1rem;
+            color: #7a5f52;
+            border-bottom: 1px dashed #dbb6a4;
+            padding-bottom: 0.4rem;
+            letter-spacing: 2px;
+        }
+
+        /* 卡片网格 — 目录式布局 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.8rem;
+            margin: 2.5rem 0 2rem;
+        }
+
+        @media (min-width: 680px) {
+            .card-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background: #ffffffeb;
+            backdrop-filter: blur(2px);
+            border-radius: 28px;
+            padding: 1.8rem 1.8rem 2rem;
+            box-shadow: 0 8px 24px rgba(120, 70, 50, 0.10), 0 2px 6px rgba(90, 50, 30, 0.06);
+            transition: box-shadow 0.2s ease;
+            border: 1px solid #f6e5db;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 28px rgba(140, 80, 60, 0.14);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 520;
+            color: #6b3f2c;
+            border-left: 5px solid #cf9f86;
+            padding-left: 0.9rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .card p, .card li {
+            font-size: 0.98rem;
+            color: #3b2c24;
+            margin-bottom: 0.8rem;
+        }
+
+        .card ul {
+            list-style: none;
+            padding-left: 0.2rem;
+        }
+
+        .card li::before {
+            content: "·";
+            color: #b67b60;
+            font-weight: 700;
+            margin-right: 0.6rem;
+        }
+
+        .card .highlight-link {
+            display: inline-block;
+            background: #e9d3c6;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 450;
+            color: #4b2f20;
+            transition: background 0.2s, color 0.2s;
+            text-decoration: none;
+            margin: 0.1rem 0.2rem;
+        }
+
+        .card .highlight-link:hover {
+            background: #d8b7a4;
+            color: #1f130e;
+        }
+
+        /* 提示区 — 暖色白卡 */
+        .notice-area {
+            background: #fffbf6;
+            border-radius: 40px;
+            padding: 1.4rem 2rem;
+            margin: 2.2rem 0 1.8rem;
+            border: 1px solid #eed9cb;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.8rem 1.5rem;
+        }
+
+        .notice-area .badge {
+            background: #dbb19b;
+            color: #281b14;
+            padding: 0.1rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 550;
+            letter-spacing: 0.3px;
+        }
+
+        .notice-area .text {
+            font-size: 0.95rem;
+            flex: 1;
+            color: #3b281f;
+        }
+
+        .notice-area a {
+            color: #794b32;
+            text-decoration: underline wavy #cf9f86 1.5px;
+            text-underline-offset: 3px;
+            font-weight: 500;
+        }
+
+        .notice-area a:hover {
+            color: #a55e3b;
+            text-decoration-style: solid;
+        }
+
+        /* 信息区 — 延伸阅读/条目 */
+        .info-block {
+            background: #fffaf5;
+            border-radius: 32px;
+            padding: 1.6rem 2rem;
+            margin: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            border: 1px solid #edd5c5;
+        }
+
+        .info-block .entry {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px dotted #edd0be;
+            padding: 0.7rem 0;
+        }
+
+        .info-block .entry:last-of-type {
+            border-bottom: none;
+        }
+
+        .info-block .term {
+            font-weight: 480;
+            color: #5c3927;
+            min-width: 8ch;
+        }
+
+        .info-block .desc {
+            color: #3e2c22;
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .info-block .tag {
+            background: #f0ddcf;
+            border-radius: 40px;
+            padding: 0.05rem 1.1rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+            color: #3e2519;
+        }
+
+        /* 按钮 / 链接卡片 圆角风格 */
+        .link-cluster {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem 1.2rem;
+            margin: 2.2rem 0 1.5rem;
+        }
+
+        .pill-link {
+            background: #f0ded2;
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 490;
+            text-decoration: none;
+            color: #3f291d;
+            border: 1px solid transparent;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .pill-link:hover {
+            background: #e1c7b6;
+            border-color: #bc8d75;
+            transform: translateY(-1px);
+        }
+
+        .pill-link.primary {
+            background: #dbb09b;
+            color: #1f140e;
+        }
+
+        .pill-link.primary:hover {
+            background: #cc9c83;
+        }
+
+        /* 底部版权 */
+        .footer-note {
+            margin-top: 3rem;
+            border-top: 1px solid #dbbaa9;
+            padding-top: 1.2rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #755e51;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 480px) {
+            .library-header h1 {
+                font-size: 2rem;
+            }
+            .card {
+                padding: 1.2rem;
+            }
+            .info-block {
+                padding: 1rem 1.2rem;
+            }
+            .notice-area {
+                padding: 1rem 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <div class="library-header">
+        <h1>📖 模拟器 · 知识集</h1>
+        <span class="sub-label">日常查询 · 对照 · 延伸阅读</span>
+    </div>
+
+    <!-- 卡片网格 目录感 -->
+    <div class="card-grid">
+        <div class="card">
+            <h2>🔍 常用对照</h2>
+            <p>在调试或测试阶段，经常需要快速比对不同版本的行为差异。将常见参数与预期输出整理成对照表，可以减少重复查阅文档的时间。</p>
+            <ul>
+                <li>环境配置与系统要求</li>
+                <li>输入输出格式示例</li>
+                <li>兼容性速查</li>
+            </ul>
+            <p style="margin-top: 0.8rem;">很多场景中，<a href="https://portal-cns-pg.com" class="highlight-link">pg模拟器</a> 被用作基准对照环境。</p>
+        </div>
+
+        <div class="card">
+            <h2>📂 延伸阅读</h2>
+            <p>从基础概念到进阶用法，知识库收录了若干分类笔记。以下条目可供快速索引：</p>
+            <ul>
+                <li>连接机制与超时处理</li>
+                <li>常见错误码说明</li>
+                <li>资源占用与调优备忘</li>
+                <li>快照与恢复流程</li>
+            </ul>
+            <p style="margin-top: 0.6rem;">部分条目基于 <a href="https://portal-cns-pg.com" class="highlight-link">pg模拟器</a> 的实际表现整理。</p>
+        </div>
+    </div>
+
+    <!-- 提示区 -->
+    <div class="notice-area">
+        <span class="badge">💡 提示</span>
+        <span class="text">
+            查询前建议确认接口版本。若需要做对比实验，<a href="https://portal-cns-pg.com">pg模拟器</a> 提供了稳定的测试环境，适合反复验证参数行为。
+        </span>
+    </div>
+
+    <!-- 信息区：结构化条目 -->
+    <div class="info-block">
+        <div class="entry">
+            <span class="term">模拟对象</span>
+            <span class="desc">通用查询与事务处理</span>
+            <span class="tag">核心</span>
+        </div>
+        <div class="entry">
+            <span class="term">常见用途</span>
+            <span class="desc">单元测试、基准对照、预发布验证</span>
+            <span class="tag">场景</span>
+        </div>
+        <div class="entry">
+            <span class="term">延伸参考</span>
+            <span class="desc">日志分析、慢查询排查、配置参数</span>
+            <span class="tag">进阶</span>
+        </div>
+    </div>
+
+    <!-- 链接区：圆角按钮感 -->
+    <div class="link-cluster">
+        <a href="https://portal-cns-pg.com" class="pill-link primary">pg模拟器</a>
+        <a href="#" class="pill-link" style="pointer-events: none; opacity: 0.7;">对照表 (待更新)</a>
+        <a href="#" class="pill-link" style="pointer-events: none; opacity: 0.7;">常见问题集</a>
+    </div>
+
+    <!-- FAQ 摘要片段（融入知识库气质） -->
+    <div style="background: #fcf4ed; border-radius: 32px; padding: 1.4rem 2rem; margin-bottom: 1.5rem; border: 1px solid #e7d1c1;">
+        <h3 style="font-weight: 470; font-size: 1.1rem; color: #613d2a; margin-bottom: 0.8rem;">📌 FAQ 摘要</h3>
+        <p style="margin-bottom: 0.6rem;"><strong>环境差异如何处理？</strong> 建议先在 <a href="https://portal-cns-pg.com" style="text-decoration: underline wavy #b57b60; color: #613d2a; text-underline-offset: 3px;">pg模拟器</a> 中复现，再比对生产日志。</p>
+        <p><strong>延伸阅读方向？</strong> 可关注索引、锁等待以及系统函数行为，知识库中有专门对照章节。</p>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer-note">
+        <span>基于日常查询与对照整理 · 内容随版本迭代</span>
+    </div>
+
+</div>
+</body>
+</html>
